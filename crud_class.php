@@ -2,13 +2,11 @@
 
 class crud_class
 {
-
     private $host;
     private $username;
     private $password;
     private $database;
     public $conn;
-
     public function __construct($host = "localhost", $username = "root", $password = "", $database = "courier_db")
     {
         $this->host = $host;
@@ -17,7 +15,6 @@ class crud_class
         $this->database = $database;
         $this->connect();
     }
-
     private function connect()
     {
         $this->conn = new mysqli($this->host, $this->username, $this->password, $this->database);
@@ -73,7 +70,7 @@ class crud_class
 
             // "SELECT * FROM users WHERE id='1' AND name='kamal' ORDER BY name ASC LIMIT 10 OFFSET 5"
         }
-        // echo $sql; // Debugging line to check the generated SQL query
+       
         $rs = $this->conn->query($sql);
         if ($rs->num_rows > 0) {
             $result["status"] = true;
