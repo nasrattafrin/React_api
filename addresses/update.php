@@ -1,9 +1,7 @@
 <?php
 include '../connection.php';
-
-$data = json_decode( file_get_contents('php://input'),true );
 $id=$_GET['id'];
 
-$res=$cc->common_update('addresses',$data,['id'=>$id]);
+$res=$cc->common_update('addresses',$_POST,['id'=>$id]);
 
 echo json_encode($res);
