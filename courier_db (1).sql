@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 12, 2026 at 08:42 AM
+-- Generation Time: Oct 13, 2026 at 09:07 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,6 +55,62 @@ INSERT INTO `addresses` (`id`, `user_id`, `type`, `name`, `phone`, `address`, `c
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `branches`
+--
+
+CREATE TABLE `branches` (
+  `id` int(11) NOT NULL,
+  `branch_name` varchar(100) NOT NULL,
+  `address` text DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `branches`
+--
+
+INSERT INTO `branches` (`id`, `branch_name`, `address`, `phone`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
+(1, 'Dhaka', 'Mirpur 10, Dhaka', '01711111111', '2026-10-13 04:30:23', NULL, '2026-10-13 07:42:51', 1, NULL),
+(2, 'Chittagong', 'Agrabad, Chittagong', '01822222222', '2026-10-13 04:30:23', NULL, NULL, NULL, NULL),
+(3, 'Sylhet', 'Zindabazar, Sylhet', '01933333333', '2026-10-13 04:30:23', NULL, NULL, NULL, NULL),
+(4, 'Khulna', 'Sonadanga, Khulna', '01644444444', '2026-10-13 04:30:23', NULL, NULL, NULL, '2026-10-13 08:15:02'),
+(5, 'Rajshahi', 'Shaheb Bazar, Rajshahi', '01755555555', '2026-10-13 04:30:23', NULL, NULL, NULL, '2026-10-13 07:42:58'),
+(6, 'Rajshahi', 'Rupnagar,rajshahi', '01890000', '2026-10-13 15:17:26', 1, '2026-10-13 08:23:47', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL,
+  `role_name` varchar(50) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `role_name`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
+(1, 'Admin', '2026-10-13 03:31:57', 1, NULL, NULL, NULL),
+(2, 'Merchant', '2026-10-13 03:31:57', 1, NULL, NULL, NULL),
+(3, 'Deliveryman', '2026-10-13 03:31:57', 1, NULL, NULL, NULL),
+(4, 'Customer', '2026-10-13 13:06:32', 1, NULL, NULL, '2026-10-13 06:07:37');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -64,6 +120,9 @@ CREATE TABLE `users` (
   `contact_no` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `branch_id` int(11) DEFAULT NULL,
+  `address` text DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 1,
   `remember_token` varchar(255) DEFAULT NULL,
   `image` varchar(255) DEFAULT NULL,
@@ -76,8 +135,8 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `status`, `remember_token`, `image`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', 1, '75371791781114195502', NULL, NULL, NULL, NULL);
+INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `role_id`, `branch_id`, `address`, `status`, `remember_token`, `image`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', NULL, NULL, NULL, 1, '75371791781114195502', NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -87,6 +146,18 @@ INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `status`, 
 -- Indexes for table `addresses`
 --
 ALTER TABLE `addresses`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `branches`
+--
+ALTER TABLE `branches`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -106,6 +177,18 @@ ALTER TABLE `users`
 --
 ALTER TABLE `addresses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT for table `branches`
+--
+ALTER TABLE `branches`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
