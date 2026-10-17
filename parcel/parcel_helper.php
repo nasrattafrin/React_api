@@ -19,14 +19,11 @@ function parcel_add_log($cc, int $parcelId, int $status, ?string $note, int $use
         'created_by' => $userId,
  ]);
 }
-
 const PARCEL_STATUS_LABELS = [ 0 => 'Pending', 1 => 'Picked', 2 => 'In Transit', 3 => 'Delivered', 4 => 'Cancelled',
 ];
-
 function parcel_status_label(int $s): string
 { return PARCEL_STATUS_LABELS[$s] ?? 'Unknown';
 }
-
 function parcel_json($status, $payload)
 {
     http_response_code($status);
