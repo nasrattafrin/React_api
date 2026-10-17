@@ -149,7 +149,7 @@ if ($method === 'POST') {
     ]);
 }
 
-// ================= PATCH (status / assign) =================
+// ================= PATCH (status / assign / edit info) =================
 if ($method === 'PATCH') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $id = (int) ($input['id'] ?? 0);
@@ -165,6 +165,43 @@ if ($method === 'PATCH') {
         parcel_json(409, ['status' => false, 'message' => 'This parcel is already finalised.']);
     }
 
+    // ===== 1. Parcel info update (receiver, phone, address, COD) =====
+    $infoFields = ['receiver_name', 'receiver_phone', 'delivery_address', 'pickup_address', 'cod_amount'];
+    $hasInfoUpdate = false;
+    $updateData = [];
+
+    foreach ($infoFields as $field) {
+        if (isset($input[$field])) {
+            $hasInfoUpdate = true;
+            if ($field === 'cod_amount') {
+                $updateData[$field] = (float) $input[$field];
+            } else {
+                $updateData[$field] = trim((string) $input[$field]);
+            }
+        }
+    }
+
+    if ($hasInfoUpdate) {
+        if (isset($updateData['receiver_name']) && $updateData['receiver_name'] === '') {
+            parcel_json(422, ['status' => false, 'message' => 'Receiver name cannot be empty.']);
+        }
+        if (isset($updateData['receiver_phone']) && $updateData['receiver_phone'] === '') {
+            parcel_json(422, ['status' => false, 'message' => 'Receiver phone cannot be empty.']);
+        }
+        if (isset($updateData['delivery_address']) && $updateData['delivery_address'] === '') {
+            parcel_json(422, ['status' => false, 'message' => 'Delivery address cannot be empty.']);
+        }
+        if (isset($updateData['cod_amount']) && $updateData['cod_amount'] < 0) {
+            parcel_json(422, ['status' => false, 'message' => 'COD cannot be negative.']);
+        }
+
+        $updateData['updated_by'] = (int) $access_user_id;
+        $cc->common_update('parcels', $updateData, ['id' => $id]);
+
+        parcel_add_log($cc, $id, $currentStatus, 'Parcel info updated', (int) $access_user_id);
+    }
+
+    // ===== 2. Status change =====
     if (isset($input['status'])) {
         $newStatus = (int) $input['status'];
         if (!in_array($newStatus, [0, 1, 2, 3, 4], true)) {
@@ -184,6 +221,7 @@ if ($method === 'PATCH') {
         }
     }
 
+    // ===== 3. Assign deliveryman =====
     if (array_key_exists('assigned_to', $input)) {
         if ($input['assigned_to'] === null || $input['assigned_to'] === '') {
             $cc->common_query("UPDATE parcels SET assigned_to = NULL, updated_by = " . (int)$access_user_id . " WHERE id = $id");
