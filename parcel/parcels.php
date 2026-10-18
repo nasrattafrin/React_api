@@ -86,7 +86,7 @@ if ($method === 'GET') {
     parcel_json(200, ['status' => true, 'parcels' => $parcels, 'limit' => $limit, 'offset' => $offset]);
 }
 
-// ================= POST (create) =================
+
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -101,20 +101,18 @@ if ($method === 'POST') {
     if ($receiverName === '' || $receiverPhone === '' || $delivery === '') {
         parcel_json(422, ['status' => false, 'message' => 'Receiver name, phone, and delivery address are required.']);
     }
-    if ($weight <= 0 || $weight > 100) {
-        parcel_json(422, ['status' => false, 'message' => 'Weight must be between 0.1 and 100 kg.']);
+    $weightErr=parcel_validate_weight($weight);
+    if ($weightErr!== null) {
+        parcel_json(422, ['status'=>false, 'message'=>$weightErr]);
     }
     if ($zoneId <= 0) {
         parcel_json(422, ['status' => false, 'message' => 'Zone is required.']);
     }
-
     $charge = parcel_calculate_charge($cc, $zoneId, $weight);
     if ($charge <= 0) {
         parcel_json(422, ['status' => false, 'message' => 'No pricing rule found for this zone/weight.']);
     }
-
     $trackingId = parcel_generate_tracking_id();
-
     $insert = $cc->common_insert('parcels', [
         'tracking_id'      => $trackingId,
         'sender_id'        => (int) $access_user_id,
@@ -148,8 +146,6 @@ if ($method === 'POST') {
         ],
     ]);
 }
-
-// ================= PATCH (status / assign / edit info) =================
 if ($method === 'PATCH') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $id = (int) ($input['id'] ?? 0);
@@ -165,7 +161,6 @@ if ($method === 'PATCH') {
         parcel_json(409, ['status' => false, 'message' => 'This parcel is already finalised.']);
     }
 
-    // ===== 1. Parcel info update (receiver, phone, address, COD) =====
     $infoFields = ['receiver_name', 'receiver_phone', 'delivery_address', 'pickup_address', 'cod_amount'];
     $hasInfoUpdate = false;
     $updateData = [];
@@ -180,7 +175,6 @@ if ($method === 'PATCH') {
             }
         }
     }
-
     if ($hasInfoUpdate) {
         if (isset($updateData['receiver_name']) && $updateData['receiver_name'] === '') {
             parcel_json(422, ['status' => false, 'message' => 'Receiver name cannot be empty.']);
@@ -194,34 +188,27 @@ if ($method === 'PATCH') {
         if (isset($updateData['cod_amount']) && $updateData['cod_amount'] < 0) {
             parcel_json(422, ['status' => false, 'message' => 'COD cannot be negative.']);
         }
-
         $updateData['updated_by'] = (int) $access_user_id;
         $cc->common_update('parcels', $updateData, ['id' => $id]);
 
         parcel_add_log($cc, $id, $currentStatus, 'Parcel info updated', (int) $access_user_id);
     }
-
-    // ===== 2. Status change =====
     if (isset($input['status'])) {
         $newStatus = (int) $input['status'];
         if (!in_array($newStatus, [0, 1, 2, 3, 4], true)) {
             parcel_json(422, ['status' => false, 'message' => 'Invalid status.']);
         }
         $note = trim($input['note'] ?? '');
-
         $cc->common_update('parcels',
             ['status' => $newStatus, 'updated_by' => (int) $access_user_id],
             ['id' => $id]
         );
-
         parcel_add_log($cc, $id, $newStatus, $note !== '' ? $note : 'Status updated', (int) $access_user_id);
 
         if ($newStatus === 3) {
             $cc->common_query("UPDATE parcels SET payment_status = IF(cod_amount > 0, 1, payment_status) WHERE id = $id");
         }
     }
-
-    // ===== 3. Assign deliveryman =====
     if (array_key_exists('assigned_to', $input)) {
         if ($input['assigned_to'] === null || $input['assigned_to'] === '') {
             $cc->common_query("UPDATE parcels SET assigned_to = NULL, updated_by = " . (int)$access_user_id . " WHERE id = $id");
@@ -239,7 +226,6 @@ if ($method === 'PATCH') {
     parcel_json(200, ['status' => true, 'message' => 'Parcel updated.']);
 }
 
-// ================= DELETE (cancel) =================
 if ($method === 'DELETE') {
     $id = (int) ($_GET['id'] ?? 0);
     if ($id <= 0) parcel_json(422, ['status' => false, 'message' => 'id is required.']);
