@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2026 at 09:01 AM
+-- Generation Time: Oct 24, 2026 at 06:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -110,7 +110,7 @@ CREATE TABLE `cod_settlements` (
 --
 
 INSERT INTO `cod_settlements` (`id`, `parcel_id`, `deliveryman_id`, `merchant_id`, `cod_amount`, `service_charge`, `net_amount`, `status`, `settled_at`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
-(1, 5, 5, 1, 500.00, 25.00, 475.00, 1, NULL, '2026-10-19 06:02:59', 1, '2026-10-19 06:03:47', 1, NULL);
+(1, 5, 5, 1, 500.00, 25.00, 475.00, 2, '2026-10-24 00:18:16', '2026-10-19 06:02:59', 1, '2026-10-24 04:36:37', 1, '2026-10-24 04:36:37');
 
 -- --------------------------------------------------------
 
@@ -323,6 +323,87 @@ INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `role_id`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `wallets`
+--
+
+CREATE TABLE `wallets` (
+  `id` int(11) NOT NULL,
+  `merchant_id` int(11) NOT NULL,
+  `balance` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wallets`
+--
+
+INSERT INTO `wallets` (`id`, `merchant_id`, `balance`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
+(1, 1, 4000.00, '2026-10-24 04:18:16', 1, '2026-10-24 04:31:00', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wallet_transactions`
+--
+
+CREATE TABLE `wallet_transactions` (
+  `id` int(11) NOT NULL,
+  `wallet_id` int(11) NOT NULL,
+  `type` tinyint(4) NOT NULL COMMENT '0=CREDIT, 1=DEBIT',
+  `amount` decimal(10,2) NOT NULL,
+  `reference` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wallet_transactions`
+--
+
+INSERT INTO `wallet_transactions` (`id`, `wallet_id`, `type`, `amount`, `reference`, `description`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
+(1, 1, 0, 475.00, 'PARCEL-5', 'COD Settled Payout', '2026-10-24 04:18:16', 1, NULL, NULL, NULL),
+(2, 1, 1, 1000.00, 'WITHDRAW-1', 'Withdraw approved (Pending Payment)', '2026-10-24 04:31:00', 1, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `withdraw_requests`
+--
+
+CREATE TABLE `withdraw_requests` (
+  `id` int(11) NOT NULL,
+  `merchant_id` int(11) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `method` tinyint(4) NOT NULL COMMENT '0=bkash,1=nagad,2=bank',
+  `account_number` varchar(50) NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0=pending,1=approved,2=paid,3=rejected',
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `processed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `withdraw_requests`
+--
+
+INSERT INTO `withdraw_requests` (`id`, `merchant_id`, `amount`, `method`, `account_number`, `status`, `requested_at`, `processed_at`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
+(1, 1, 1000.00, 0, '01711111111', 1, '2026-10-24 04:20:55', '2026-10-24 00:31:00', '2026-10-24 04:20:55', 1, '2026-10-24 04:31:00', 1, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `zones`
 --
 
@@ -406,6 +487,24 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email_2` (`email`);
 
 --
+-- Indexes for table `wallets`
+--
+ALTER TABLE `wallets`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `wallet_transactions`
+--
+ALTER TABLE `wallet_transactions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `withdraw_requests`
+--
+ALTER TABLE `withdraw_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `zones`
 --
 ALTER TABLE `zones`
@@ -468,6 +567,24 @@ ALTER TABLE `roles`
 --
 ALTER TABLE `users`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `wallets`
+--
+ALTER TABLE `wallets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `wallet_transactions`
+--
+ALTER TABLE `wallet_transactions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `withdraw_requests`
+--
+ALTER TABLE `withdraw_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `zones`

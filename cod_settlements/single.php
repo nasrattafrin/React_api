@@ -50,8 +50,35 @@ if ($method === 'PUT') {
         'status'     => $status,
         'updated_by' => (int) $access_user_id,
     ];
-    if ($status === 2) {
+     if ($status === 2) {
         $updateData['settled_at'] = date('Y-m-d H:i:s');
+        $updateData['updated_by'] = (int) $access_user_id;
+        $settleRes = $cc->common_query("SELECT parcel_id, merchant_id, net_amount FROM cod_settlements WHERE id = $id");
+        if ($settleRes['status'] && !empty($settleRes['data'])) {
+            $settle = $settleRes['data'][0];
+
+            $walletRes = $cc->common_query("SELECT id FROM wallets WHERE merchant_id = {$settle->merchant_id} AND deleted_at IS NULL LIMIT 1");
+            
+            if (!$walletRes['status'] || empty($walletRes['data'])) {
+                $walletInsert = $cc->common_insert('wallets', [
+                    'merchant_id' => $settle->merchant_id, 
+                    'balance' => 0,
+                    'created_by' => (int) $access_user_id
+                ]);
+                $walletId = $walletInsert['data'];
+            } else {
+                $walletId = $walletRes['data'][0]->id;
+            }
+            $cc->common_query("UPDATE wallets SET balance = balance + {$settle->net_amount}, updated_by = " . (int)$access_user_id . " WHERE id = $walletId");
+             $cc->common_insert('wallet_transactions', [
+                'wallet_id' => $walletId,
+                'type' => 0, 
+                'amount' => $settle->net_amount,
+                'reference' => 'PARCEL-' . $settle->parcel_id,
+                'description' => 'COD Settled Payout',
+                'created_by' => (int) $access_user_id
+            ]);
+        }
     }
     $cc->common_update('cod_settlements', $updateData, ['id' => $id]);
     echo json_encode(['status' => true, 'message' => 'Settlement updated.']);
