@@ -1,4 +1,5 @@
 <?php
+// wallets/transactions.php
 include __DIR__ . '/../connection.php';
 include __DIR__ . '/../auth_check.php';
 
@@ -15,8 +16,18 @@ if ($wallet_id <= 0) {
     exit;
 }
 
+// Merchant Security Check
+if (isset($access_user_role) && (int)$access_user_role === 2) {
+    $checkOwner = $cc->common_query("SELECT id FROM wallets WHERE id = $wallet_id AND merchant_id = $access_user_id");
+    if (!$checkOwner['status'] || empty($checkOwner['data'])) {
+        http_response_code(403);
+        echo json_encode(['status' => false, 'message' => 'Unauthorized access.']);
+        exit;
+    }
+}
+
 $res = $cc->common_query("
-    SELECT id, type, amount, reference, description, created_at, created_by
+    SELECT id, type, amount, reference, description, created_at
     FROM wallet_transactions
     WHERE wallet_id = $wallet_id AND deleted_at IS NULL
     ORDER BY created_at DESC

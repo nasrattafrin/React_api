@@ -1,4 +1,5 @@
 <?php
+// withdraw_requests/index.php
 include __DIR__ . '/../connection.php';
 include __DIR__ . '/../auth_check.php';
 
@@ -8,13 +9,26 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
+$where = ["w.deleted_at IS NULL"];
+
+
+if (isset($access_user_role) && (int)$access_user_role === 2) {
+    $where[] = "w.merchant_id = " . (int)$access_user_id;
+}
+
 $res = $cc->common_query("
-    SELECT w.id, w.amount, w.method, w.account_number, w.status, w.requested_at,
-           w.created_at, w.updated_at, u.name AS merchant_name
+    SELECT w.id, w.amount, w.method, w.account_number, w.status, 
+           w.requested_at, w.processed_at, u.name AS merchant_name
     FROM withdraw_requests w
     JOIN users u ON u.id = w.merchant_id
-    WHERE w.deleted_at IS NULL
-    ORDER BY w.requested_at DESC
+    WHERE " . implode(' AND ', $where) . "
+    ORDER BY w.id DESC
 ");
 
-echo json_encode(['status' => true, 'data' => $res['status'] ? $res['data'] : []]);
+$rows = $res['status'] ? $res['data'] : [];
+
+echo json_encode([
+    'status'   => true,
+    'data'     => $rows,
+    'requests' => $rows 
+]);

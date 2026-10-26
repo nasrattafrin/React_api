@@ -1,8 +1,12 @@
 <?php
+// parcel/parcels.php
 include __DIR__ . '/../connection.php';
 include __DIR__ . '/../auth_check.php';
 include __DIR__ . '/parcel_helper.php';
+
 $method = $_SERVER['REQUEST_METHOD'];
+
+// ================= GET =================
 if ($method === 'GET') {
     if (isset($_GET['id'])) {
         $id = (int) $_GET['id'];
@@ -40,6 +44,12 @@ if ($method === 'GET') {
         parcel_json(200, ['status' => true, 'parcel' => $parcel, 'logs' => $logs]);
     }
     $where = ["p.deleted_at IS NULL"];
+    
+    // NOTUN: Jodi user Merchant (role_id = 2) hoy, shudhu tar parcel gulo dekhabe
+    if (isset($access_user_role) && (int)$access_user_role === 2) {
+        $where[] = "p.sender_id = " . (int)$access_user_id;
+    }
+
     if (isset($_GET['status']) && $_GET['status'] !== '') {
         $where[] = "p.status = " . (int) $_GET['status'];
     }
@@ -76,14 +86,20 @@ if ($method === 'GET') {
             WHERE " . implode(' AND ', $where) . "
             ORDER BY p.created_at DESC
             LIMIT $limit OFFSET $offset";
+
     $res = $cc->common_query($sql);
     $parcels = $res['status'] ? $res['data'] : [];
     foreach ($parcels as &$p) {
         $p->status_label = parcel_status_label((int) $p->status);
     }
+
     parcel_json(200, ['status' => true, 'parcels' => $parcels, 'limit' => $limit, 'offset' => $offset]);
+}
+
+// ================= POST (create) =================
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
+
     $receiverName  = trim($input['receiver_name']  ?? '');
     $receiverPhone = trim($input['receiver_phone'] ?? '');
     $pickup        = trim($input['pickup_address'] ?? '');
@@ -96,21 +112,27 @@ if ($method === 'POST') {
     if ($receiverName === '' || $receiverPhone === '' || $delivery === '') {
         parcel_json(422, ['status' => false, 'message' => 'Receiver name, phone, and delivery address are required.']);
     }
+    
     if ($senderId <= 0) {
         parcel_json(422, ['status' => false, 'message' => 'Merchant is required.']);
     }
+
     $weightErr = parcel_validate_weight($weight);
     if ($weightErr !== null) {
         parcel_json(422, ['status' => false, 'message' => $weightErr]);
     }
+    
     if ($zoneId <= 0) {
         parcel_json(422, ['status' => false, 'message' => 'Zone is required.']);
     }
+    
     $charge = parcel_calculate_charge($cc, $zoneId, $weight);
     if ($charge <= 0) {
         parcel_json(422, ['status' => false, 'message' => 'No pricing rule found for this zone/weight.']);
     }
+    
     $trackingId = parcel_generate_tracking_id();
+    
     $insert = $cc->common_insert('parcels', [
         'tracking_id'      => $trackingId,
         'sender_id'        => $senderId,
@@ -126,9 +148,11 @@ if ($method === 'POST') {
         'payment_status'   => 0,
         'created_by'       => (int) $access_user_id,
     ]);
+
     if (!$insert['status']) {
-        parcel_json(500, ['status' => false, 'message' => 'Could not create parcel.']);
+        parcel_json(500, ['status' => false, 'message' => 'Could not create parcel. DB Error: ' . $insert['message']]);
     }
+
     $parcelId = (int) $insert['data'];
     parcel_add_log($cc, $parcelId, 0, 'Parcel created', (int) $access_user_id);
 
@@ -142,6 +166,8 @@ if ($method === 'POST') {
         ],
     ]);
 }
+
+// ================= PATCH (status / assign / edit info) =================
 if ($method === 'PATCH') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $id = (int) ($input['id'] ?? 0);
@@ -156,6 +182,8 @@ if ($method === 'PATCH') {
     if (in_array($currentStatus, [3, 4], true)) {
         parcel_json(409, ['status' => false, 'message' => 'This parcel is already finalised.']);
     }
+
+    // ===== 1. Parcel info update =====
     $infoFields = ['receiver_name', 'receiver_phone', 'delivery_address', 'pickup_address', 'cod_amount'];
     $hasInfoUpdate = false;
     $updateData = [];
@@ -189,17 +217,22 @@ if ($method === 'PATCH') {
 
         parcel_add_log($cc, $id, $currentStatus, 'Parcel info updated', (int) $access_user_id);
     }
+
+    // ===== 2. Status change =====
     if (isset($input['status'])) {
         $newStatus = (int) $input['status'];
         if (!in_array($newStatus, [0, 1, 2, 3, 4], true)) {
             parcel_json(422, ['status' => false, 'message' => 'Invalid status.']);
         }
         $note = trim($input['note'] ?? '');
+        
         $cc->common_update('parcels',
             ['status' => $newStatus, 'updated_by' => (int) $access_user_id],
             ['id' => $id]
         );
         parcel_add_log($cc, $id, $newStatus, $note !== '' ? $note : 'Status updated', (int) $access_user_id);
+
+        // Auto-mark payment status & Auto-create COD settlement on Delivered
         if ($newStatus === 3) {
             $cc->common_query("UPDATE parcels SET payment_status = IF(cod_amount > 0, 1, payment_status) WHERE id = $id");
 
@@ -230,6 +263,8 @@ if ($method === 'PATCH') {
             }
         }
     }
+
+    // ===== 3. Assign deliveryman =====
     if (array_key_exists('assigned_to', $input)) {
         if ($input['assigned_to'] === null || $input['assigned_to'] === '') {
             $cc->common_query("UPDATE parcels SET assigned_to = NULL, updated_by = " . (int)$access_user_id . " WHERE id = $id");
@@ -243,8 +278,11 @@ if ($method === 'PATCH') {
             parcel_add_log($cc, $id, $currentStatus, 'Assigned to deliveryman #' . $assignedTo, (int) $access_user_id);
         }
     }
+
     parcel_json(200, ['status' => true, 'message' => 'Parcel updated.']);
 }
+
+// ================= DELETE (cancel) =================
 if ($method === 'DELETE') {
     $id = (int) ($_GET['id'] ?? 0);
     if ($id <= 0) parcel_json(422, ['status' => false, 'message' => 'id is required.']);
@@ -256,11 +294,14 @@ if ($method === 'DELETE') {
     if ((int) $res['data'][0]->status === 3) {
         parcel_json(409, ['status' => false, 'message' => 'Delivered parcel cannot be cancelled.']);
     }
+
     $cc->common_update('parcels',
         ['status' => 4, 'updated_by' => (int) $access_user_id],
         ['id' => $id]
     );
     parcel_add_log($cc, $id, 4, 'Parcel cancelled', (int) $access_user_id);
+
     parcel_json(200, ['status' => true, 'message' => 'Parcel cancelled.']);
 }
+
 parcel_json(405, ['status' => false, 'message' => 'Method not allowed.']);

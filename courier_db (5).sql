@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 25, 2026 at 05:10 AM
+-- Generation Time: Oct 26, 2026 at 05:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -113,7 +113,8 @@ INSERT INTO `cod_settlements` (`id`, `parcel_id`, `deliveryman_id`, `merchant_id
 (1, 5, 5, 1, 500.00, 25.00, 475.00, 2, '2026-10-24 00:18:16', '2026-10-19 06:02:59', 1, '2026-10-24 04:36:37', 1, '2026-10-24 04:36:37'),
 (2, 6, 5, 1, 3000.00, 150.00, 2850.00, 0, NULL, '2026-10-25 03:22:29', 1, '2026-10-25 03:45:40', 1, '2026-10-25 03:45:40'),
 (3, 7, 6, 1, 1197.00, 59.85, 1137.15, 2, '2026-10-24 22:51:30', '2026-10-25 03:46:37', 1, '2026-10-25 03:51:30', 1, NULL),
-(4, 8, 6, 7, 1499.00, 74.95, 1424.05, 0, NULL, '2026-10-25 04:03:00', 1, NULL, NULL, NULL);
+(4, 8, 6, 7, 1499.00, 74.95, 1424.05, 0, NULL, '2026-10-25 04:03:00', 1, NULL, NULL, NULL),
+(5, 9, 6, 9, 400.00, 20.00, 380.00, 2, '2026-10-25 01:49:24', '2026-10-25 06:48:38', 1, '2026-10-25 06:49:24', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -152,7 +153,8 @@ INSERT INTO `parcels` (`id`, `tracking_id`, `sender_id`, `receiver_name`, `recei
 (2, 'TRK-20261018-FA695B', 1, 'Shamsun Nahar', '01858322', 'cda', 'cda', 0.80, 1, 60.00, 1200.00, 3, 1, 5, '2026-10-18 04:00:02', 1, '2026-10-18 04:06:34', 1, NULL),
 (6, 'TRK-20261025-F75AE8', 1, 'Sadman', '015625461', 'nasirbad', 'nasirabad', 0.80, 2, 130.00, 3000.00, 3, 1, 5, '2026-10-25 03:11:29', 1, '2026-10-25 03:22:29', 1, NULL),
 (7, 'TRK-20261025-21F012', 1, 'Safat', '012836278', 'fouzdarhat', 'fouzdarhat', 0.60, 1, 60.00, 1197.00, 3, 1, 6, '2026-10-25 03:13:58', 1, '2026-10-25 03:46:37', 1, NULL),
-(8, 'TRK-20261025-409E8C', 7, 'Nasrat', '012723', 'cda', 'cda', 0.50, 1, 60.00, 1499.00, 3, 1, 6, '2026-10-25 04:02:10', 1, '2026-10-25 04:03:00', 1, NULL);
+(8, 'TRK-20261025-409E8C', 7, 'Nasrat', '012723', 'cda', 'cda', 0.50, 1, 60.00, 1499.00, 3, 1, 6, '2026-10-25 04:02:10', 1, '2026-10-25 04:03:00', 1, NULL),
+(9, 'TRK-20261025-8274B4', 9, 'abir', '57656876', 'cda', 'cda', 0.10, 1, 60.00, 400.00, 3, 1, 6, '2026-10-25 04:32:00', 1, '2026-10-25 06:48:38', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -224,7 +226,12 @@ INSERT INTO `parcel_logs` (`id`, `parcel_id`, `status`, `note`, `created_at`, `c
 (45, 8, 0, 'Assigned to deliveryman #6', '2026-10-25 04:02:14', 1, NULL, NULL, NULL),
 (46, 8, 1, 'Status updated', '2026-10-25 04:02:57', 1, NULL, NULL, NULL),
 (47, 8, 2, 'Status updated', '2026-10-25 04:02:58', 1, NULL, NULL, NULL),
-(48, 8, 3, 'Status updated', '2026-10-25 04:03:00', 1, NULL, NULL, NULL);
+(48, 8, 3, 'Status updated', '2026-10-25 04:03:00', 1, NULL, NULL, NULL),
+(49, 9, 0, 'Parcel created', '2026-10-25 04:32:00', 1, NULL, NULL, NULL),
+(50, 9, 0, 'Assigned to deliveryman #6', '2026-10-25 06:00:14', 1, NULL, NULL, NULL),
+(51, 9, 1, 'Status updated', '2026-10-25 06:48:33', 1, NULL, NULL, NULL),
+(52, 9, 2, 'Status updated', '2026-10-25 06:48:35', 1, NULL, NULL, NULL),
+(53, 9, 3, 'Status updated', '2026-10-25 06:48:38', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -258,7 +265,8 @@ INSERT INTO `payments` (`id`, `parcel_id`, `amount`, `method`, `transaction_id`,
 (5, 5, 500.00, 3, '', 1, '2026-10-19 06:02:56', 1, NULL, NULL, NULL),
 (6, 6, 3000.00, 3, '', 1, '2026-10-25 03:22:27', 1, NULL, NULL, NULL),
 (7, 7, 1197.00, 3, '', 1, '2026-10-25 03:46:32', 1, NULL, NULL, NULL),
-(8, 8, 1499.00, 3, '', 1, '2026-10-25 04:02:52', 1, NULL, NULL, NULL);
+(8, 8, 1499.00, 3, '', 1, '2026-10-25 04:02:52', 1, NULL, NULL, NULL),
+(9, 9, 400.00, 3, '', 1, '2026-10-25 06:48:55', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -341,10 +349,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `role_id`, `branch_id`, `address`, `status`, `remember_token`, `image`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', NULL, NULL, NULL, 1, '43531792817801396701', NULL, NULL, NULL, NULL),
+(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', NULL, NULL, NULL, 1, '13081792987391661566', NULL, NULL, NULL, NULL),
 (5, 'anika', '0123435', 'adrtin@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', 3, 1, '6tyrd57yd5r', 1, NULL, NULL, '2026-10-17 01:16:27', NULL, NULL),
 (6, 'Tafrin', '0126382', 'tafrin@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', 3, 1, 'mirpur', 1, NULL, NULL, '2026-10-24 22:16:04', NULL, NULL),
-(7, 'Merchant Farzana', '01711111111', 'rahim@gmail.com', '20eabe5d64b0e216796e834f52d61fd0b70332fc', 2, NULL, NULL, 1, NULL, NULL, '2026-10-25 03:18:47', NULL, NULL),
+(7, 'Merchant Farzana', '01711111111', 'rahim@gmail.com', '20eabe5d64b0e216796e834f52d61fd0b70332fc', 2, NULL, NULL, 1, '62401792987884830116', NULL, '2026-10-25 03:18:47', NULL, NULL),
 (8, 'Karim Traders', '01822222222', 'karim@gmail.com', '7c222fb2927d828af22f592134e8932480637c0d', 2, NULL, NULL, 1, NULL, NULL, '2026-10-25 03:20:17', NULL, NULL),
 (9, 'Azam Enterprise', '01933333333', 'azam@gmail.com', '7c222fb2927d828af22f592134e8932480637c0d', 2, NULL, NULL, 1, NULL, NULL, '2026-10-25 03:20:17', NULL, NULL);
 
@@ -370,9 +378,10 @@ CREATE TABLE `wallets` (
 --
 
 INSERT INTO `wallets` (`id`, `merchant_id`, `balance`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
-(2, 9, 59322.00, '2026-10-25 03:34:51', 1, '2026-10-25 03:35:53', 1, NULL),
-(3, 8, 2000.00, '2026-10-25 03:43:41', 1, NULL, NULL, NULL),
-(4, 1, 1137.15, '2026-10-25 03:51:30', 1, '2026-10-25 03:51:30', 1, NULL);
+(2, 9, 59702.00, '2026-10-25 03:34:51', 1, '2026-10-25 06:49:24', 1, NULL),
+(3, 8, 500.00, '2026-10-25 03:43:41', 1, '2026-10-25 06:50:56', 1, NULL),
+(4, 1, 1137.15, '2026-10-25 03:51:30', 1, '2026-10-25 03:51:30', 1, NULL),
+(5, 7, 2901.00, '2026-10-25 06:01:04', 1, '2026-10-26 04:04:09', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -404,7 +413,13 @@ INSERT INTO `wallet_transactions` (`id`, `wallet_id`, `type`, `amount`, `referen
 (3, 2, 0, 60000.00, 'ADMIN-DEPOSIT', 'Manual balance added by Admin', '2026-10-25 03:34:51', 1, NULL, NULL, NULL),
 (4, 2, 1, 678.00, 'WITHDRAW-2', 'Withdraw approved (Pending Payment)', '2026-10-25 03:35:53', 1, NULL, NULL, NULL),
 (5, 3, 0, 2000.00, 'ADMIN-DEPOSIT', 'Manual balance added by Admin', '2026-10-25 03:43:41', 1, NULL, NULL, NULL),
-(6, 4, 0, 1137.15, 'PARCEL-7', 'COD Settled Payout', '2026-10-25 03:51:30', 1, NULL, NULL, NULL);
+(6, 4, 0, 1137.15, 'PARCEL-7', 'COD Settled Payout', '2026-10-25 03:51:30', 1, NULL, NULL, NULL),
+(7, 5, 0, 5000.00, 'ADMIN-DEPOSIT', 'Manual balance added by Admin', '2026-10-25 06:01:05', 1, NULL, NULL, NULL),
+(8, 2, 0, 380.00, 'PARCEL-9', 'COD Settled Payout', '2026-10-25 06:49:24', 1, NULL, NULL, NULL),
+(9, 5, 1, 1500.00, 'WITHDRAW-4', 'Withdraw approved (Pending Payment)', '2026-10-25 06:49:52', 1, NULL, NULL, NULL),
+(10, 3, 1, 1500.00, 'WITHDRAW-3', 'Withdraw approved (Pending Payment)', '2026-10-25 06:50:56', 1, NULL, NULL, NULL),
+(11, 5, 1, 99.00, 'WITHDRAW-6', 'Withdraw approved by Admin', '2026-10-26 03:56:38', 1, NULL, NULL, NULL),
+(12, 5, 1, 500.00, 'WITHDRAW-5', 'Withdraw approved by Admin', '2026-10-26 04:04:09', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -435,7 +450,10 @@ CREATE TABLE `withdraw_requests` (
 INSERT INTO `withdraw_requests` (`id`, `merchant_id`, `amount`, `method`, `account_number`, `status`, `requested_at`, `processed_at`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
 (1, 1, 1000.00, 0, '01711111111', 1, '2026-10-24 04:20:55', '2026-10-24 00:31:00', '2026-10-24 04:20:55', 1, '2026-10-24 04:31:00', 1, NULL),
 (2, 9, 678.00, 0, '01933333333', 1, '2026-10-24 22:35:49', '2026-10-24 22:35:54', '2026-10-25 03:35:49', 1, '2026-10-25 03:35:54', 1, NULL),
-(3, 8, 1500.00, 0, '01822222222', 0, '2026-10-24 22:43:56', NULL, '2026-10-25 03:43:56', 1, NULL, NULL, NULL);
+(3, 8, 1500.00, 0, '01822222222', 1, '2026-10-24 22:43:56', '2026-10-25 01:50:56', '2026-10-25 03:43:56', 1, '2026-10-25 06:50:56', 1, NULL),
+(4, 7, 1500.00, 0, '01711111111', 1, '2026-10-25 01:01:31', '2026-10-25 01:49:52', '2026-10-25 06:01:31', 1, '2026-10-25 06:49:52', 1, NULL),
+(5, 7, 500.00, 0, '01711111111', 1, '2026-10-25 22:43:55', '2026-10-25 23:04:09', '2026-10-26 03:43:55', 7, '2026-10-26 04:04:09', 1, NULL),
+(6, 7, 99.00, 0, '01711111111', 1, '2026-10-25 22:46:46', '2026-10-25 22:56:38', '2026-10-26 03:46:46', 7, '2026-10-26 03:56:38', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -566,25 +584,25 @@ ALTER TABLE `branches`
 -- AUTO_INCREMENT for table `cod_settlements`
 --
 ALTER TABLE `cod_settlements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `parcels`
 --
 ALTER TABLE `parcels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `parcel_logs`
 --
 ALTER TABLE `parcel_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `pricing`
@@ -608,19 +626,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `wallets`
 --
 ALTER TABLE `wallets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `wallet_transactions`
 --
 ALTER TABLE `wallet_transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `withdraw_requests`
 --
 ALTER TABLE `withdraw_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `zones`

@@ -1,13 +1,15 @@
 <?php
+// withdraw_requests/single.php
 include __DIR__ . '/../connection.php';
 include __DIR__ . '/../auth_check.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-if ($method === 'PUT') {
+// PUT ba POST duitai allow kora holo
+if ($method === 'POST' || $method === 'PUT') {
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     $id = (int) ($input['id'] ?? 0);
-    $newStatus = (int) ($input['status'] ?? -1); // 1=Approved, 2=Paid, 3=Rejected
+    $newStatus = (int) ($input['status'] ?? -1); 
 
     if ($id <= 0 || !in_array($newStatus, [1, 2, 3])) {
         http_response_code(422);
@@ -29,12 +31,12 @@ if ($method === 'PUT') {
         exit;
     }
 
+    // APPROVE LOGIC
     if ($newStatus === 1) {
-        // APPROVED: Check Wallet Balance & Debit
         $walletRes = $cc->common_query("SELECT id, balance FROM wallets WHERE merchant_id = {$req->merchant_id} AND deleted_at IS NULL LIMIT 1");
         if (!$walletRes['status'] || empty($walletRes['data'])) {
             http_response_code(404);
-            echo json_encode(['status' => false, 'message' => 'Wallet not found for this merchant.']);
+            echo json_encode(['status' => false, 'message' => 'Wallet not found.']);
             exit;
         }
         $wallet = $walletRes['data'][0];
@@ -45,35 +47,31 @@ if ($method === 'PUT') {
             exit;
         }
 
-        // Debit Wallet
+        // Wallet Debit
         $newBalance = $wallet->balance - $req->amount;
-        $cc->common_update('wallets', [
-            'balance' => $newBalance,
-            'updated_by' => (int) $access_user_id
-        ], ['id' => $wallet->id]);
+        $cc->common_update('wallets', ['balance' => $newBalance, 'updated_by' => (int) $access_user_id], ['id' => $wallet->id]);
 
-        // Log Transaction
+        // Transaction Log
         $cc->common_insert('wallet_transactions', [
             'wallet_id' => $wallet->id,
-            'type' => 1, // DEBIT
+            'type' => 1, // 1 = DEBIT
             'amount' => $req->amount,
             'reference' => 'WITHDRAW-' . $id,
-            'description' => 'Withdraw approved (Pending Payment)',
+            'description' => 'Withdraw approved by Admin',
             'created_by' => (int) $access_user_id
         ]);
     }
 
-    // Update Request Status
-    $updateData = [
+    // Update Status
+    $cc->common_update('withdraw_requests', [
         'status' => $newStatus, 
         'processed_at' => date('Y-m-d H:i:s'),
         'updated_by' => (int) $access_user_id
-    ];
-    $cc->common_update('withdraw_requests', $updateData, ['id' => $id]);
+    ], ['id' => $id]);
 
     echo json_encode(['status' => true, 'message' => 'Withdraw request updated successfully.']);
     exit;
 }
 
 http_response_code(405);
-echo json_encode(['status' => false, 'message' => 'Method not allowed.']);
+echo json_encode(['status' => false, 'message' => 'Method not allowed. Current method: ' . $method]);
