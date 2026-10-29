@@ -45,7 +45,7 @@ if ($method === 'GET') {
     }
     $where = ["p.deleted_at IS NULL"];
     
-    // NOTUN: Jodi user Merchant (role_id = 2) hoy, shudhu tar parcel gulo dekhabe
+    // Jodi user Merchant (role_id = 2) hoy, shudhu tar parcel gulo dekhabe
     if (isset($access_user_role) && (int)$access_user_role === 2) {
         $where[] = "p.sender_id = " . (int)$access_user_id;
     }
@@ -232,7 +232,24 @@ if ($method === 'PATCH') {
         );
         parcel_add_log($cc, $id, $newStatus, $note !== '' ? $note : 'Status updated', (int) $access_user_id);
 
-        // Auto-mark payment status & Auto-create COD settlement on Delivered
+        
+        $parcelInfo = $cc->common_query("SELECT tracking_id, sender_id FROM parcels WHERE id = $id");
+        if ($parcelInfo['status'] && !empty($parcelInfo['data'])) {
+            $pInfo = $parcelInfo['data'][0];
+            $trackingId = $pInfo->tracking_id;
+            $statusNames = [0 => 'Pending', 1 => 'Picked Up', 2 => 'In Transit', 3 => 'Delivered', 4 => 'Cancelled'];
+            $statusName = $statusNames[$newStatus] ?? 'Updated';
+
+            $msgMerchant = "Your parcel $trackingId status has been updated to: $statusName.";
+            $cc->common_insert('notifications', [
+                'user_id' => (int) $pInfo->sender_id,
+                'type'    => 0, // 0 = SMS
+                'message' => $msgMerchant,
+                'status'  => 0 // 0 = Sent
+            ]);
+        }
+
+        // Delivered mark hole COD settlement auto-create
         if ($newStatus === 3) {
             $cc->common_query("UPDATE parcels SET payment_status = IF(cod_amount > 0, 1, payment_status) WHERE id = $id");
 
@@ -242,7 +259,7 @@ if ($method === 'PATCH') {
                 
                 if ((float)$p->cod_amount > 0 && $p->assigned_to) {
                     $dup = $cc->common_query("SELECT id FROM cod_settlements WHERE parcel_id = $id AND deleted_at IS NULL LIMIT 1");
-                    
+
                     if (!$dup['status'] || empty($dup['data'])) {
                         $cod = (float) $p->cod_amount;
                         $service = $cod * 0.05; // 5% service charge
@@ -294,12 +311,22 @@ if ($method === 'DELETE') {
     if ((int) $res['data'][0]->status === 3) {
         parcel_json(409, ['status' => false, 'message' => 'Delivered parcel cannot be cancelled.']);
     }
-
     $cc->common_update('parcels',
         ['status' => 4, 'updated_by' => (int) $access_user_id],
         ['id' => $id]
     );
     parcel_add_log($cc, $id, 4, 'Parcel cancelled', (int) $access_user_id);
+    $parcelInfo = $cc->common_query("SELECT tracking_id, sender_id FROM parcels WHERE id = $id");
+    if ($parcelInfo['status'] && !empty($parcelInfo['data'])) {
+        $pInfo = $parcelInfo['data'][0];
+        $msgMerchant = "Your parcel {$pInfo->tracking_id} has been Cancelled.";
+        $cc->common_insert('notifications', [
+            'user_id' => (int) $pInfo->sender_id,
+            'type'    => 0,
+            'message' => $msgMerchant,
+            'status'  => 0
+        ]);
+    }
 
     parcel_json(200, ['status' => true, 'message' => 'Parcel cancelled.']);
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2026 at 05:26 AM
+-- Generation Time: Oct 29, 2026 at 08:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -114,7 +114,38 @@ INSERT INTO `cod_settlements` (`id`, `parcel_id`, `deliveryman_id`, `merchant_id
 (2, 6, 5, 1, 3000.00, 150.00, 2850.00, 0, NULL, '2026-10-25 03:22:29', 1, '2026-10-25 03:45:40', 1, '2026-10-25 03:45:40'),
 (3, 7, 6, 1, 1197.00, 59.85, 1137.15, 2, '2026-10-24 22:51:30', '2026-10-25 03:46:37', 1, '2026-10-25 03:51:30', 1, NULL),
 (4, 8, 6, 7, 1499.00, 74.95, 1424.05, 0, NULL, '2026-10-25 04:03:00', 1, NULL, NULL, NULL),
-(5, 9, 6, 9, 400.00, 20.00, 380.00, 2, '2026-10-25 01:49:24', '2026-10-25 06:48:38', 1, '2026-10-25 06:49:24', 1, NULL);
+(5, 9, 6, 9, 400.00, 20.00, 380.00, 2, '2026-10-25 01:49:24', '2026-10-25 06:48:38', 1, '2026-10-25 06:49:24', 1, NULL),
+(6, 10, 6, 9, 3000.00, 150.00, 2850.00, 2, '2026-10-26 04:05:12', '2026-10-26 09:04:32', 1, '2026-10-26 09:05:13', 1, NULL),
+(7, 11, 6, 7, 1200.00, 60.00, 1140.00, 0, NULL, '2026-10-29 06:54:14', 1, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0=SMS, 1=Email',
+  `message` text NOT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0=Sent, 1=Failed',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=Unread, 1=Read'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`, `deleted_at`, `is_read`) VALUES
+(1, 7, 0, 'Your parcel TRK-20261029-B16685 status has been updated to: Picked Up.', 0, '2026-10-29 06:54:10', '2026-10-29 07:00:23', NULL, NULL, NULL, 1),
+(2, 7, 0, 'Your parcel TRK-20261029-B16685 status has been updated to: In Transit.', 0, '2026-10-29 06:54:12', '2026-10-29 07:00:23', NULL, NULL, NULL, 1),
+(3, 7, 0, 'Your parcel TRK-20261029-B16685 status has been updated to: Delivered.', 0, '2026-10-29 06:54:13', '2026-10-29 07:00:23', NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -154,7 +185,8 @@ INSERT INTO `parcels` (`id`, `tracking_id`, `sender_id`, `receiver_name`, `recei
 (6, 'TRK-20261025-F75AE8', 1, 'Sadman', '015625461', 'nasirbad', 'nasirabad', 0.80, 2, 130.00, 3000.00, 3, 1, 5, '2026-10-25 03:11:29', 1, '2026-10-25 03:22:29', 1, NULL),
 (7, 'TRK-20261025-21F012', 1, 'Safat', '012836278', 'fouzdarhat', 'fouzdarhat', 0.60, 1, 60.00, 1197.00, 3, 1, 6, '2026-10-25 03:13:58', 1, '2026-10-25 03:46:37', 1, NULL),
 (8, 'TRK-20261025-409E8C', 7, 'Nasrat', '012723', 'cda', 'cda', 0.50, 1, 60.00, 1499.00, 3, 1, 6, '2026-10-25 04:02:10', 1, '2026-10-25 04:03:00', 1, NULL),
-(9, 'TRK-20261025-8274B4', 9, 'abir', '57656876', 'cda', 'cda', 0.10, 1, 60.00, 400.00, 3, 1, 6, '2026-10-25 04:32:00', 1, '2026-10-25 06:48:38', 1, NULL);
+(10, 'TRK-20261026-A8BE6E', 9, 'Safa', '0192093', 'panchlaish', 'panchlaish', 0.60, 2, 130.00, 3000.00, 3, 1, 6, '2026-10-26 06:12:02', 1, '2026-10-26 09:04:32', 1, NULL),
+(11, 'TRK-20261029-B16685', 7, 'safdcsa', 'fgdfg', 'ewrt', 'rgrtg', 0.40, 1, 60.00, 1200.00, 3, 1, 6, '2026-10-29 06:54:04', 1, '2026-10-29 06:54:13', 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -231,7 +263,17 @@ INSERT INTO `parcel_logs` (`id`, `parcel_id`, `status`, `note`, `created_at`, `c
 (50, 9, 0, 'Assigned to deliveryman #6', '2026-10-25 06:00:14', 1, NULL, NULL, NULL),
 (51, 9, 1, 'Status updated', '2026-10-25 06:48:33', 1, NULL, NULL, NULL),
 (52, 9, 2, 'Status updated', '2026-10-25 06:48:35', 1, NULL, NULL, NULL),
-(53, 9, 3, 'Status updated', '2026-10-25 06:48:38', 1, NULL, NULL, NULL);
+(53, 9, 3, 'Status updated', '2026-10-25 06:48:38', 1, NULL, NULL, NULL),
+(54, 10, 0, 'Parcel created', '2026-10-26 06:12:02', 1, NULL, NULL, NULL),
+(55, 10, 0, 'Assigned to deliveryman #6', '2026-10-26 06:12:27', 1, NULL, NULL, NULL),
+(56, 10, 1, 'Status updated', '2026-10-26 09:04:26', 1, NULL, NULL, NULL),
+(57, 10, 2, 'Status updated', '2026-10-26 09:04:30', 1, NULL, NULL, NULL),
+(58, 10, 3, 'Status updated', '2026-10-26 09:04:32', 1, NULL, NULL, NULL),
+(59, 11, 0, 'Parcel created', '2026-10-29 06:54:04', 1, NULL, NULL, NULL),
+(60, 11, 0, 'Assigned to deliveryman #6', '2026-10-29 06:54:08', 1, NULL, NULL, NULL),
+(61, 11, 1, 'Status updated', '2026-10-29 06:54:10', 1, NULL, NULL, NULL),
+(62, 11, 2, 'Status updated', '2026-10-29 06:54:12', 1, NULL, NULL, NULL),
+(63, 11, 3, 'Status updated', '2026-10-29 06:54:13', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -266,7 +308,8 @@ INSERT INTO `payments` (`id`, `parcel_id`, `amount`, `method`, `transaction_id`,
 (6, 6, 3000.00, 3, '', 1, '2026-10-25 03:22:27', 1, NULL, NULL, NULL),
 (7, 7, 1197.00, 3, '', 1, '2026-10-25 03:46:32', 1, NULL, NULL, NULL),
 (8, 8, 1499.00, 3, '', 1, '2026-10-25 04:02:52', 1, NULL, NULL, NULL),
-(9, 9, 400.00, 3, '', 1, '2026-10-25 06:48:55', 1, NULL, NULL, NULL);
+(9, 9, 400.00, 3, '', 1, '2026-10-25 06:48:55', 1, NULL, NULL, NULL),
+(10, 10, 3000.00, 3, '', 1, '2026-10-26 09:04:44', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -324,6 +367,34 @@ INSERT INTO `roles` (`id`, `role_name`, `created_at`, `created_by`, `updated_at`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `support_tickets`
+--
+
+CREATE TABLE `support_tickets` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `parcel_id` int(11) DEFAULT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `admin_reply` text DEFAULT NULL,
+  `status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0=Open, 1=In Progress, 2=Closed',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `created_by` int(11) DEFAULT NULL,
+  `updated_by` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `support_tickets`
+--
+
+INSERT INTO `support_tickets` (`id`, `user_id`, `parcel_id`, `subject`, `message`, `admin_reply`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`, `deleted_at`) VALUES
+(4, 7, 8, 'sfdewsfr', 'tfe4rgt', 'rtgyry', 2, '2026-10-29 06:24:36', '2026-10-29 06:29:44', 7, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -349,10 +420,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `contact_no`, `email`, `password`, `role_id`, `branch_id`, `address`, `status`, `remember_token`, `image`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', NULL, NULL, NULL, 1, '13081792987391661566', NULL, NULL, NULL, NULL),
+(1, 'anika', NULL, 'anika@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', NULL, NULL, NULL, 1, '28881793255125932528', NULL, NULL, NULL, NULL),
 (5, 'anika', '0123435', 'adrtin@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', 3, 1, '6tyrd57yd5r', 1, NULL, NULL, '2026-10-17 01:16:27', NULL, NULL),
 (6, 'Tafrin', '0126382', 'tafrin@gmail.com', 'f7c3bc1d808e04732adf679965ccc34ca7ae3441', 3, 1, 'mirpur', 1, NULL, NULL, '2026-10-24 22:16:04', NULL, NULL),
-(7, 'Merchant Farzana', '01711111111', 'rahim@gmail.com', '20eabe5d64b0e216796e834f52d61fd0b70332fc', 2, NULL, NULL, 1, '62401792987884830116', NULL, '2026-10-25 03:18:47', NULL, NULL),
+(7, 'Merchant Farzana', '01711111111', 'rahim@gmail.com', '20eabe5d64b0e216796e834f52d61fd0b70332fc', 2, NULL, NULL, 1, '98611793254971349404', NULL, '2026-10-25 03:18:47', NULL, NULL),
 (8, 'Karim Traders', '01822222222', 'karim@gmail.com', '7c222fb2927d828af22f592134e8932480637c0d', 2, NULL, NULL, 1, NULL, NULL, '2026-10-25 03:20:17', NULL, NULL),
 (9, 'Azam Enterprise', '01933333333', 'azam@gmail.com', '7c222fb2927d828af22f592134e8932480637c0d', 2, NULL, NULL, 1, NULL, NULL, '2026-10-25 03:20:17', NULL, NULL);
 
@@ -378,7 +449,7 @@ CREATE TABLE `wallets` (
 --
 
 INSERT INTO `wallets` (`id`, `merchant_id`, `balance`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`) VALUES
-(2, 9, 59702.00, '2026-10-25 03:34:51', 1, '2026-10-25 06:49:24', 1, NULL),
+(2, 9, 62552.00, '2026-10-25 03:34:51', 1, '2026-10-26 09:05:12', 1, NULL),
 (3, 8, 500.00, '2026-10-25 03:43:41', 1, '2026-10-25 06:50:56', 1, NULL),
 (4, 1, 1137.15, '2026-10-25 03:51:30', 1, '2026-10-25 03:51:30', 1, NULL),
 (5, 7, 2901.00, '2026-10-25 06:01:04', 1, '2026-10-26 04:04:09', 1, NULL);
@@ -419,7 +490,8 @@ INSERT INTO `wallet_transactions` (`id`, `wallet_id`, `type`, `amount`, `referen
 (9, 5, 1, 1500.00, 'WITHDRAW-4', 'Withdraw approved (Pending Payment)', '2026-10-25 06:49:52', 1, NULL, NULL, NULL),
 (10, 3, 1, 1500.00, 'WITHDRAW-3', 'Withdraw approved (Pending Payment)', '2026-10-25 06:50:56', 1, NULL, NULL, NULL),
 (11, 5, 1, 99.00, 'WITHDRAW-6', 'Withdraw approved by Admin', '2026-10-26 03:56:38', 1, NULL, NULL, NULL),
-(12, 5, 1, 500.00, 'WITHDRAW-5', 'Withdraw approved by Admin', '2026-10-26 04:04:09', 1, NULL, NULL, NULL);
+(12, 5, 1, 500.00, 'WITHDRAW-5', 'Withdraw approved by Admin', '2026-10-26 04:04:09', 1, NULL, NULL, NULL),
+(13, 2, 0, 2850.00, 'PARCEL-10', 'COD Settled Payout', '2026-10-26 09:05:12', 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -453,7 +525,8 @@ INSERT INTO `withdraw_requests` (`id`, `merchant_id`, `amount`, `method`, `accou
 (3, 8, 1500.00, 0, '01822222222', 1, '2026-10-24 22:43:56', '2026-10-25 01:50:56', '2026-10-25 03:43:56', 1, '2026-10-25 06:50:56', 1, NULL),
 (4, 7, 1500.00, 0, '01711111111', 1, '2026-10-25 01:01:31', '2026-10-25 01:49:52', '2026-10-25 06:01:31', 1, '2026-10-25 06:49:52', 1, NULL),
 (5, 7, 500.00, 0, '01711111111', 1, '2026-10-25 22:43:55', '2026-10-25 23:04:09', '2026-10-26 03:43:55', 7, '2026-10-26 04:04:09', 1, NULL),
-(6, 7, 99.00, 0, '01711111111', 1, '2026-10-25 22:46:46', '2026-10-25 22:56:38', '2026-10-26 03:46:46', 7, '2026-10-26 03:56:38', 1, NULL);
+(6, 7, 99.00, 0, '01711111111', 1, '2026-10-25 22:46:46', '2026-10-25 22:56:38', '2026-10-26 03:46:46', 7, '2026-10-26 03:56:38', 1, NULL),
+(7, 7, 200.00, 1, '01711111111', 0, '2026-10-26 01:09:53', NULL, '2026-10-26 06:09:53', 7, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -503,6 +576,12 @@ ALTER TABLE `cod_settlements`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `parcels`
 --
 ALTER TABLE `parcels`
@@ -530,6 +609,12 @@ ALTER TABLE `pricing`
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -584,25 +669,31 @@ ALTER TABLE `branches`
 -- AUTO_INCREMENT for table `cod_settlements`
 --
 ALTER TABLE `cod_settlements`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `parcels`
 --
 ALTER TABLE `parcels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `parcel_logs`
 --
 ALTER TABLE `parcel_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `pricing`
@@ -614,6 +705,12 @@ ALTER TABLE `pricing`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -632,13 +729,13 @@ ALTER TABLE `wallets`
 -- AUTO_INCREMENT for table `wallet_transactions`
 --
 ALTER TABLE `wallet_transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `withdraw_requests`
 --
 ALTER TABLE `withdraw_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `zones`
